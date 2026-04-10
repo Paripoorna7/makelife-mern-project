@@ -171,7 +171,7 @@ const ForgotPasswordModal = ({ onClose }) => {
     if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) { setError('Please enter a valid email.'); return; }
     setLoading(true); setError('');
     try {
-      const data = await apiFetch('/auth/forgot-password', { method:'POST', body: JSON.stringify({ email }) });
+      const data = await apiFetch('${process.env.REACT_APP_API_URL}/auth/forgot-password', { method:'POST', body: JSON.stringify({ email }) });
       if (data?.code) setCode(String(data.code));
       setStep('sent');
     } catch (err) {
@@ -188,7 +188,7 @@ const ForgotPasswordModal = ({ onClose }) => {
     if (!code.trim() || code.length < 4) { setError('Please enter the verification code.'); return; }
     setLoading(true); setError('');
     try {
-      await apiFetch('/auth/verify-reset-code', { method:'POST', body: JSON.stringify({ email, code }) });
+      await apiFetch('${process.env.REACT_APP_API_URL}/auth/verify-reset-code', { method:'POST', body: JSON.stringify({ email, code }) });
       setStep('reset');
     } catch (err) { setError(err.message || 'Invalid code. Please try again.'); }
     setLoading(false);
@@ -199,7 +199,7 @@ const ForgotPasswordModal = ({ onClose }) => {
     if (newPwd !== confirmPwd) { setError('Passwords do not match.'); return; }
     setLoading(true); setError('');
     try {
-      await apiFetch('/auth/reset-password', { method:'POST', body: JSON.stringify({ email, code, newPassword: newPwd }) });
+      await apiFetch('${process.env.REACT_APP_API_URL}/auth/reset-password', { method:'POST', body: JSON.stringify({ email, code, newPassword: newPwd }) });
       setSuccess('Password reset successfully! You can now sign in.');
       setTimeout(onClose, 2500);
     } catch (err) { setError(err.message || 'Failed to reset password. Please try again.'); }
@@ -1681,7 +1681,7 @@ const TABS = [
               setFounderPhotoFile(null); setFounderPhotoPreview('');
             }
             const payload = { ...founderStory, founderPhoto: photoUrl };
-            try { await adminFetch('/founder-story', { method:'POST', body:JSON.stringify(payload) }); } catch {}
+            try { await adminFetch(`${process.env.REACT_APP_API_URL}/founder-story`, { method:'POST', body:JSON.stringify(payload) }); } catch {}
             try { localStorage.setItem('ml_founder_story', JSON.stringify(payload)); } catch {}
             setFounderStory(payload);
             showToast('Our Story section saved successfully.');
@@ -3766,7 +3766,7 @@ const effectiveEmail = (donorEmail || '').trim() || (currentUser?.email || '').t
 
   // ── Save to backend using already-captured local constants ──
   try {
-    await apiFetch('/donations', { method: 'POST', body: JSON.stringify(donationData) });
+    await apiFetch(`${process.env.REACT_APP_API_URL}/donations`, { method: 'POST', body: JSON.stringify(donationData) });
     fetchDonations();
   } catch(err) {
     console.error('Donation save failed:', err);
@@ -3791,7 +3791,7 @@ const effectiveEmail = (donorEmail || '').trim() || (currentUser?.email || '').t
     const sponsorEmail = currentUser?.email || '';
     try {
       const savedPhone = localStorage.getItem('ml_user_phone') || '';
-      await apiFetch('/donations',{method:'POST',body:JSON.stringify({donorName:name,amount:val,childId:String(sponsorChild._id),childName:cname,donorEmail:sponsorEmail,donorPhone:savedPhone})});
+      await apiFetch(`${process.env.REACT_APP_API_URL}/donations`, {method:'POST',body:JSON.stringify({donorName:name,amount:val,childId:String(sponsorChild._id),childName:cname,donorEmail:sponsorEmail,donorPhone:savedPhone})});
       fetchDonations();
     } catch {}
     setSponsorSubmitting(false);
@@ -3815,7 +3815,7 @@ const handleCustomAmountSubmit = async () => {
   setThankYouDonorName(name); setThankYouAmount(val); setSponsorChildName(''); setShowThankYouModal(true);
   try {
     const savedPhone = localStorage.getItem('ml_user_phone') || '';
-    await apiFetch('/donations', { method: 'POST', body: JSON.stringify({ donorName: name, amount: val, donorEmail: currentUser?.email || '', donorPhone: savedPhone }) });
+    await apiFetch(`${process.env.REACT_APP_API_URL}/donations`, { method: 'POST', body: JSON.stringify({ donorName: name, amount: val, donorEmail: currentUser?.email || '', donorPhone: savedPhone }) });
     fetchDonations();
   } catch {}
 };
@@ -3827,7 +3827,7 @@ const handleCustomAmountSubmit = async () => {
     e.preventDefault(); setAdoptSubmitting(true);
     try {
       const payload={childId:String(adoptChild._id),childName:adoptChild.name,...adoptForm,annualIncome:parseFloat(adoptForm.annualIncome),familyMembers:parseInt(adoptForm.familyMembers)};
-      await apiFetch('/adoptions',{method:'POST',body:JSON.stringify(payload)});
+      await apiFetch(`${process.env.REACT_APP_API_URL}/adoptions',{method:'POST',body:JSON.stringify(payload)});
       setAdoptSuccess(true);
     } catch(err) { setAdoptError(err.message); }
     finally { setAdoptSubmitting(false); }
@@ -3837,7 +3837,7 @@ const handleCustomAmountSubmit = async () => {
   const handleContactSubmit = async e => {
     e.preventDefault(); setContactSubmitting(true); setContactError(''); setContactSuccess(false);
     try {
-      await apiFetch('/contact',{method:'POST',body:JSON.stringify(contactForm)});
+      await apiFetch('${process.env.REACT_APP_API_URL}/contact',{method:'POST',body:JSON.stringify(contactForm)});
       setContactSuccess(true); setTimeout(()=>setContactSuccess(false),4000);
       setContactForm({name:'',email:'',phone:'',message:''});
     } catch(err) { setContactError(err.message.includes('fetch')||err.message.includes('Network')?'NETWORK_ERROR':err.message); }
@@ -3852,7 +3852,7 @@ const handleCustomAmountSubmit = async () => {
   const initials = (currentUser?.name||'G').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 
   return (
-    <div style={{ minHeight:'100vh', background:`linear-gradient(180deg,${C.bg},#fef9f6)`, fontFamily:"'Crimson Pro',Georgia,serif" }}>
+    <div style={{ minHeight:'100vh', background:`linear-gradient(180deg,${C.bg},#fef9f6)` , fontFamily:"'Crimson Pro',Georgia,serif" }}>
 
       {showLoginGate && (
         <LoginGateModal
@@ -5484,7 +5484,7 @@ onKeyDown={e => {
                   if(!/\S+@\S+\.\S+/.test(volunteerForm.email)){setVolunteerError('Please enter a valid email address.');return;}
                   setVolunteerSubmitting(true);setVolunteerError('');
                   try{
-                    await apiFetch('/volunteers',{method:'POST',body:JSON.stringify(volunteerForm)});
+                    await apiFetch('${process.env.REACT_APP_API_URL}/volunteers',{method:'POST',body:JSON.stringify(volunteerForm)});
                     // Also save to time-donations
                  setVolunteerSuccess(true);
                     setVolunteerSuccess(true);
