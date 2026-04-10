@@ -2,11 +2,6 @@
 const router = require('express').Router();
 const Donation = require('../models/Donation');
 
-<<<<<<< HEAD
-router.post('/', async (req,res)=>{
-  const donation = await Donation.create(req.body);
-  res.json(donation);
-=======
 router.post('/', async (req, res) => {
   try {
     const { donorName, amount, childId, childName, donorEmail, donorPhone } = req.body;
@@ -24,7 +19,6 @@ router.post('/', async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: 'Error saving donation', error });
   }
->>>>>>> 145dd94 (Updated backend to use MongoDB URI with environment variables)
 });
 
 router.get('/', async (req,res)=>{
@@ -32,8 +26,4 @@ router.get('/', async (req,res)=>{
   res.json(data);
 });
 
-<<<<<<< HEAD
 module.exports = router;
-=======
-module.exports = router;
->>>>>>> 6c147e2 (Fixed frontend backup issue and updated backend env config)
