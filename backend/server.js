@@ -47,6 +47,15 @@ const volunteerRoutes = require('./routes/volunteerRoutes');
 const memberRoutes    = require('./routes/memberRoutes');
 const goodsDonationRoutes = require('./routes/goodsDonationRoutes');
 
+console.log("authRoutes:", typeof authRoutes);
+console.log("donationRoutes:", typeof donationRoutes);
+console.log("childRoutes:", typeof childRoutes);
+console.log("uploadRoutes:", typeof uploadRoutes);
+console.log("adoptionRoutes:", typeof adoptionRoutes);
+console.log("contactRoutes:", typeof contactRoutes);
+console.log("volunteerRoutes:", typeof volunteerRoutes);
+console.log("memberRoutes:", typeof memberRoutes);
+
 app.use('/api/auth',       authRoutes);
 app.use('/api/donations',  donationRoutes);
 app.use('/api/children',   childRoutes);
