@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # MakeLife - NGO Management System
 
 Welcome to the **MakeLife** repository! This is a comprehensive MERN (MongoDB, Express, React, Node.js) stack project designed to streamline and manage the operations of a Non-Governmental Organization (NGO).
@@ -98,3 +99,16 @@ Contributions are what make the open-source community such an amazing place to l
 ## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
+=======
+## Backend
+
+cd backend  
+npm install  
+npm start  
+
+## Frontend
+
+npx create-react-app frontend  
+Replace src/App.js with provided file  
+npm start
+>>>>>>> 145dd94 (Updated backend to use MongoDB URI with environment variables)
