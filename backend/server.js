@@ -5,11 +5,6 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
-const authRoutes     = require('./routes/authRoutes');
-const donationRoutes = require('./routes/donationRoutes');
-const childRoutes    = require('./routes/childRoutes');
-const uploadRoutes   = require('./routes/uploadRoutes');
-const adoptionRoutes = require('./routes/adoptionRoutes');
 
 const app = express();
 
