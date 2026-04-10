@@ -12,12 +12,12 @@ router.post('/', async (req, res) => {
     const { donorName, amount, childId, childName, donorEmail, donorPhone } = req.body;
     const donationType = childId && childName ? 'sponsorship' : 'general';
     const donation = await Donation.create({
-      donorName: donorName || 'Anonymous',
+      donorName:  donorName  || 'Anonymous',
       amount,
-      childId: childId || null,
-      childName: childName || null,
-      donorEmail: donorEmail || null,
-      donorPhone: donorPhone || null,
+      donorEmail,
+      donorPhone,
+      childId:    childId    || null,
+      childName:  childName  || null,
       donationType
     });
     res.status(201).json(donation);
@@ -32,4 +32,8 @@ router.get('/', async (req,res)=>{
   res.json(data);
 });
 
+<<<<<<< HEAD
 module.exports = router;
+=======
+module.exports = router;
+>>>>>>> 6c147e2 (Fixed frontend backup issue and updated backend env config)
