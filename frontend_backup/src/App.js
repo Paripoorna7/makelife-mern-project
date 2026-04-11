@@ -3839,7 +3839,7 @@ const handleCustomAmountSubmit = async () => {
     e.preventDefault(); setAdoptSubmitting(true);
     try {
       const payload={childId:String(adoptChild._id),childName:adoptChild.name,...adoptForm,annualIncome:parseFloat(adoptForm.annualIncome),familyMembers:parseInt(adoptForm.familyMembers)};
-      await apiFetch(`${process.env.REACT_APP_API_URL}/adoptions',{method:'POST',body:JSON.stringify(payload)});
+      await apiFetch(`${process.env.REACT_APP_API_URL}/adoptions`,{method:'POST',body:JSON.stringify(payload)});
       setAdoptSuccess(true);
     } catch(err) { setAdoptError(err.message); }
     finally { setAdoptSubmitting(false); }
@@ -3849,7 +3849,7 @@ const handleCustomAmountSubmit = async () => {
   const handleContactSubmit = async e => {
     e.preventDefault(); setContactSubmitting(true); setContactError(''); setContactSuccess(false);
     try {
-      await apiFetch(`${process.env.REACT_APP_API_URL}/contact``,{method:'POST',body:JSON.stringify(contactForm)});
+      await apiFetch(`${process.env.REACT_APP_API_URL}/contact`,{method:'POST',body:JSON.stringify(contactForm)});
       setContactSuccess(true); setTimeout(()=>setContactSuccess(false),4000);
       setContactForm({name:'',email:'',phone:'',message:''});
     } catch(err) { setContactError(err.message.includes('fetch')||err.message.includes('Network')?'NETWORK_ERROR':err.message); }
