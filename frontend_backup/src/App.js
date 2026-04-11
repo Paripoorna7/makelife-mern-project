@@ -164,8 +164,20 @@ const ForgotPasswordModal = ({ onClose }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const fi = e => { e.target.style.borderColor = C.primary; e.target.style.boxShadow = '0 0 0 3px rgba(217,119,87,.12)'; };
-  const fo = e => { e.target.style.borderColor = C.light; e.target.style.boxShadow = 'none'; };
+  const fi = (e) => {
+  const el = e.target;
+  if (el && el.style) {
+    el.style.borderColor = C.primary;
+    el.style.boxShadow = '0 0 0 3px rgba(217,119,87,.12)';
+  }
+  };
+  const fo = (e) => {
+  const el = e.target;
+  if (el && el.style) {
+    el.style.borderColor = C.light;
+    el.style.boxShadow = 'none';
+  }
+  };
 
   const sendCode = async () => {
     if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) { setError('Please enter a valid email.'); return; }
@@ -3837,7 +3849,7 @@ const handleCustomAmountSubmit = async () => {
   const handleContactSubmit = async e => {
     e.preventDefault(); setContactSubmitting(true); setContactError(''); setContactSuccess(false);
     try {
-      await apiFetch('${process.env.REACT_APP_API_URL}/contact',{method:'POST',body:JSON.stringify(contactForm)});
+      await apiFetch(`${process.env.REACT_APP_API_URL}/contact``,{method:'POST',body:JSON.stringify(contactForm)});
       setContactSuccess(true); setTimeout(()=>setContactSuccess(false),4000);
       setContactForm({name:'',email:'',phone:'',message:''});
     } catch(err) { setContactError(err.message.includes('fetch')||err.message.includes('Network')?'NETWORK_ERROR':err.message); }
@@ -3852,7 +3864,7 @@ const handleCustomAmountSubmit = async () => {
   const initials = (currentUser?.name||'G').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 
   return (
-    <div style={{ minHeight:'100vh', background:`linear-gradient(180deg,${C.bg},#fef9f6)` , fontFamily:"'Crimson Pro',Georgia,serif" }}>
+    <div style={{ minHeight:'100vh', background:`linear-gradient(180deg,${C.bg},#fef9f6)` , fontFamily:"'Crimson Pro',Georgia,serif"  }}>
 
       {showLoginGate && (
         <LoginGateModal
