@@ -3826,7 +3826,7 @@ const effectiveEmail = (donorEmail || '').trim() || (currentUser?.email || '').t
 
   // ── Save to backend using already-captured local constants ──
   try {
-    await apiFetch(`${process.env.REACT_APP_API_URL}/donations`, { method: 'POST', body: JSON.stringify(donationData) });
+    await apiFetch('/donations', { method: 'POST', body: JSON.stringify(donationData) });
     fetchDonations();
   } catch(err) {
     console.error('Donation save failed:', err);
@@ -3851,7 +3851,7 @@ const effectiveEmail = (donorEmail || '').trim() || (currentUser?.email || '').t
     const sponsorEmail = currentUser?.email || '';
     try {
       const savedPhone = localStorage.getItem('ml_user_phone') || '';
-      await apiFetch(`${process.env.REACT_APP_API_URL}/donations`, {method:'POST',body:JSON.stringify({donorName:name,amount:val,childId:String(sponsorChild._id),childName:cname,donorEmail:sponsorEmail,donorPhone:savedPhone})});
+      await apiFetch('/donations', {method:'POST',body:JSON.stringify({donorName:name,amount:val,childId:String(sponsorChild._id),childName:cname,donorEmail:sponsorEmail,donorPhone:savedPhone})});
       fetchDonations();
     } catch {}
     setSponsorSubmitting(false);
@@ -3875,7 +3875,7 @@ const handleCustomAmountSubmit = async () => {
   setThankYouDonorName(name); setThankYouAmount(val); setSponsorChildName(''); setShowThankYouModal(true);
   try {
     const savedPhone = localStorage.getItem('ml_user_phone') || '';
-    await apiFetch(`${process.env.REACT_APP_API_URL}/donations`, { method: 'POST', body: JSON.stringify({ donorName: name, amount: val, donorEmail: currentUser?.email || '', donorPhone: savedPhone }) });
+    await apiFetch('/donations', { method: 'POST', body: JSON.stringify({ donorName: name, amount: val, donorEmail: currentUser?.email || '', donorPhone: savedPhone }) });
     fetchDonations();
   } catch {}
 };
@@ -3887,7 +3887,7 @@ const handleCustomAmountSubmit = async () => {
     e.preventDefault(); setAdoptSubmitting(true);
     try {
       const payload={childId:String(adoptChild._id),childName:adoptChild.name,...adoptForm,annualIncome:parseFloat(adoptForm.annualIncome),familyMembers:parseInt(adoptForm.familyMembers)};
-      await apiFetch(`${process.env.REACT_APP_API_URL}/adoptions`,{method:'POST',body:JSON.stringify(payload)});
+      await apiFetch('/adoptions',{method:'POST',body:JSON.stringify(payload)});
       setAdoptSuccess(true);
     } catch(err) { setAdoptError(err.message); }
     finally { setAdoptSubmitting(false); }
@@ -3897,7 +3897,7 @@ const handleCustomAmountSubmit = async () => {
   const handleContactSubmit = async e => {
     e.preventDefault(); setContactSubmitting(true); setContactError(''); setContactSuccess(false);
     try {
-      await apiFetch(`${process.env.REACT_APP_API_URL}/contact`,{method:'POST',body:JSON.stringify(contactForm)});
+      await apiFetch('/contact',{method:'POST',body:JSON.stringify(contactForm)});
       setContactSuccess(true); setTimeout(()=>setContactSuccess(false),4000);
       setContactForm({name:'',email:'',phone:'',message:''});
     } catch(err) { setContactError(err.message.includes('fetch')||err.message.includes('Network')?'NETWORK_ERROR':err.message); }
@@ -5549,7 +5549,7 @@ onKeyDown={e => {
                   if(!/\S+@\S+\.\S+/.test(volunteerForm.email)){setVolunteerError('Please enter a valid email address.');return;}
                   setVolunteerSubmitting(true);setVolunteerError('');
                   try{
-                    await apiFetch('${process.env.REACT_APP_API_URL}/volunteers',{method:'POST',body:JSON.stringify(volunteerForm)});
+                    await apiFetch('/volunteers',{method:'POST',body:JSON.stringify(volunteerForm)});
                     // Also save to time-donations
                  setVolunteerSuccess(true);
                     setVolunteerSuccess(true);
