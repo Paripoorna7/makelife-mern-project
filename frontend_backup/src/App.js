@@ -1013,25 +1013,20 @@ useEffect(() => {
     if (!files || files.length === 0) return;
     setSlideUploading(true);
     let successCount = 0;
+    const token = localStorage.getItem('ml_admin_token') || localStorage.getItem('ml_token');
     for (const file of Array.from(files)) {
       if (!file.type.startsWith('image/')) continue;
       try {
-        const token = localStorage.getItem('ml_admin_token') || localStorage.getItem('ml_token');
+        // Send directly to /api/slides as multipart — Cloudinary handles storage
         const fd = new FormData();
         fd.append('photo', file);
-        let photoUrl = null;
-        try {
-          const ur = await fetch(`${API}/upload`, { method:'POST', body:fd, headers: token ? { Authorization:`Bearer ${token}` } : {} });
-          if (ur.ok) {
-            const res = await ur.json();
-            photoUrl = res.url || res.path || res.filename;
-            if (photoUrl && !photoUrl.startsWith('http')) photoUrl = `${process.env.REACT_APP_API_URL}/${photoUrl}`;
-          }
-        } catch {}
-        if (!photoUrl) photoUrl = URL.createObjectURL(file);
-        let savedSlide = null;
-        try { savedSlide = await adminFetch('/slides', { method:'POST', body: JSON.stringify({ url: photoUrl }) }); } catch {}
-        const newSlide = savedSlide || { _id:`local_${Date.now()}_${Math.random()}`, url:photoUrl, createdAt:new Date().toISOString() };
+        const res = await fetch(`${API}/slides`, {
+          method: 'POST',
+          body: fd,
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const savedSlide = res.ok ? await res.json() : null;
+        const newSlide = savedSlide || { _id:`local_${Date.now()}_${Math.random()}`, url: URL.createObjectURL(file), createdAt: new Date().toISOString() };
         setSlides(prev => {
           const updated = [...prev, newSlide];
           try { localStorage.setItem('ml_slides', JSON.stringify(updated)); } catch {}
@@ -1496,27 +1491,36 @@ const TABS = [
                     </div>
                   </div>
 
-                  {/* Drag & drop upload zone */}
-                  <div
-                    onClick={() => !slideUploading && slideInputRef.current?.click()}
+                  {/* Drag & drop / tap upload zone */}
+                  <label
+                    htmlFor="slide-upload-zone"
                     onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor = C.adAccent; e.currentTarget.style.background = 'rgba(90,138,94,.06)'; }}
                     onDragLeave={e => { e.currentTarget.style.borderColor = C.adBorder; e.currentTarget.style.background = 'transparent'; }}
                     onDrop={e => { e.preventDefault(); e.currentTarget.style.borderColor = C.adBorder; e.currentTarget.style.background = 'transparent'; handleSlideUpload(e.dataTransfer.files); }}
                     style={{ border:`2.5px dashed ${C.adBorder}`, borderRadius:'16px', padding:'2.5rem',
                       textAlign:'center', cursor: slideUploading ? 'not-allowed' : 'pointer',
-                      marginBottom:'1.5rem', transition:'all .2s' }}>
+                      marginBottom:'1.5rem', transition:'all .2s', display:'block' }}>
+                    <input
+                      id="slide-upload-zone"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      disabled={slideUploading}
+                      style={{ display:'none' }}
+                      onChange={e => { handleSlideUpload(e.target.files); e.target.value = ''; }}
+                    />
                     <div style={{ width:'56px', height:'56px', borderRadius:'50%',
                       background:`rgba(90,138,94,.1)`, display:'flex', alignItems:'center',
                       justifyContent:'center', margin:'0 auto .8rem' }}>
                       <Image size={26} color={C.adAccent} />
                     </div>
                     <div style={{ fontSize:'1rem', fontWeight:700, color:C.adText, marginBottom:'.3rem' }}>
-                      Click or drag & drop photos here
+                      {slideUploading ? 'Uploading…' : 'Click or drag & drop photos here'}
                     </div>
                     <div style={{ fontSize:'.85rem', color:C.adMid }}>
                       JPG, PNG, WebP supported · Multiple files allowed
                     </div>
-                  </div>
+                  </label>
 
                   {/* Photo grid */}
                   {slidesLoading ? (
@@ -3402,6 +3406,8 @@ const AppRoot = () => {
    HOME SLIDESHOW COMPONENT
 ══════════════════════════════════════════════════════════════════════ */
 const HomeSlideshow = ({ photos = [] }) => {
+  const { isMobile, isTablet } = useBreakpoint();
+  const slideshowHeight = isMobile ? '240px' : isTablet ? '340px' : '480px';
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState('next');
   const [animating, setAnimating] = useState(false);
@@ -3443,7 +3449,7 @@ const HomeSlideshow = ({ photos = [] }) => {
       <div style={{ background:'linear-gradient(135deg,#f4e8de,#ead7c8)', borderRadius:'28px', padding:'3rem',
         boxShadow:'0 20px 60px rgba(0,0,0,.1)', border:`2px solid ${C.light}`, textAlign:'center',
         display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
-        gap:'1rem', minHeight:'320px' }}>
+        gap:'1rem', minHeight: isMobile ? '180px' : '320px' }}>
         <div style={{ width:'72px', height:'72px', borderRadius:'50%', background:'rgba(217,119,87,.15)',
           display:'flex', alignItems:'center', justifyContent:'center' }}>
           <Heart size={32} color={C.primary} fill={C.primary} style={{ opacity:.6 }} />
@@ -3458,7 +3464,9 @@ const HomeSlideshow = ({ photos = [] }) => {
 
   return (
     <div style={{ position:'relative', borderRadius:'28px', overflow:'hidden',
-  boxShadow:'0 20px 60px rgba(0,0,0,.15)', userSelect:'none', height:'480px', background:'#1a1008' }}>
+  boxShadow:'0 20px 60px rgba(0,0,0,.15)', userSelect:'none',
+  height: slideshowHeight,
+  background:'#1a1008' }}>
       <div style={{ width:'100%', height:'100%', position:'relative', overflow:'hidden',
         cursor: photos.length > 1 ? 'grab' : 'default' }}
         onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
@@ -4173,6 +4181,11 @@ const handleCustomAmountSubmit = async () => {
         </div>
         {!isMobile && <HomeSlideshow photos={homepageSlides} />}
       </div>
+      {isMobile && homepageSlides.length > 0 && (
+        <div style={{ marginTop:'1.5rem' }}>
+          <HomeSlideshow photos={homepageSlides} />
+        </div>
+      )}
     </section>
 
     {/* ── OUR STORY ── */}
