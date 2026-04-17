@@ -46,6 +46,8 @@ const contactRoutes   = require('./routes/contactRoutes');
 const volunteerRoutes = require('./routes/volunteerRoutes');
 const memberRoutes    = require('./routes/memberRoutes');
 const goodsDonationRoutes = require('./routes/goodsDonationRoutes');
+const slidesRoutes        = require('./routes/slidesRoutes');
+const founderStoryRoutes  = require('./routes/founderStoryRoutes');
 
 console.log("authRoutes:", typeof authRoutes);
 console.log("donationRoutes:", typeof donationRoutes);
@@ -56,14 +58,18 @@ console.log("contactRoutes:", typeof contactRoutes);
 console.log("volunteerRoutes:", typeof volunteerRoutes);
 console.log("memberRoutes:", typeof memberRoutes);
 
-app.use('/api/auth',       authRoutes);
-app.use('/api/donations',  donationRoutes);
-app.use('/api/children',   childRoutes);
-app.use('/api/upload',     uploadRoutes);
-app.use('/api/adoptions',  adoptionRoutes);
-app.use('/api/contact',    contactRoutes);
-app.use('/api/volunteers', volunteerRoutes);
-app.use('/api/members',    memberRoutes);
+app.use('/api/auth',           authRoutes);
+app.use('/api/donations',      donationRoutes);
+app.use('/api/children',       childRoutes);
+app.use('/api/upload',         uploadRoutes);
+app.use('/api/adoptions',      adoptionRoutes);
+app.use('/api/contact',        contactRoutes);
+app.use('/api/volunteers',     volunteerRoutes);
+app.use('/api/members',        memberRoutes);
+app.use('/api/goods-donation', goodsDonationRoutes);
+app.use('/api/goods-donations',goodsDonationRoutes);
+app.use('/api/slides',         slidesRoutes);
+app.use('/api/founder-story',  founderStoryRoutes);
 
 // ✅ 404 handler
 app.use((req, res) => {
