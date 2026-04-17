@@ -183,7 +183,7 @@ const ForgotPasswordModal = ({ onClose }) => {
     if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) { setError('Please enter a valid email.'); return; }
     setLoading(true); setError('');
     try {
-      const data = await apiFetch('${process.env.REACT_APP_API_URL}/auth/forgot-password', { method:'POST', body: JSON.stringify({ email }) });
+      const data = await apiFetch('/auth/forgot-password', { method:'POST', body: JSON.stringify({ email }) });
       if (data?.code) setCode(String(data.code));
       setStep('sent');
     } catch (err) {
@@ -200,7 +200,7 @@ const ForgotPasswordModal = ({ onClose }) => {
     if (!code.trim() || code.length < 4) { setError('Please enter the verification code.'); return; }
     setLoading(true); setError('');
     try {
-      await apiFetch('${process.env.REACT_APP_API_URL}/auth/verify-reset-code', { method:'POST', body: JSON.stringify({ email, code }) });
+      await apiFetch('/auth/verify-reset-code', { method:'POST', body: JSON.stringify({ email, code }) });
       setStep('reset');
     } catch (err) { setError(err.message || 'Invalid code. Please try again.'); }
     setLoading(false);
@@ -211,7 +211,7 @@ const ForgotPasswordModal = ({ onClose }) => {
     if (newPwd !== confirmPwd) { setError('Passwords do not match.'); return; }
     setLoading(true); setError('');
     try {
-      await apiFetch('${process.env.REACT_APP_API_URL}/auth/reset-password', { method:'POST', body: JSON.stringify({ email, code, newPassword: newPwd }) });
+      await apiFetch('/auth/reset-password', { method:'POST', body: JSON.stringify({ email, code, newPassword: newPwd }) });
       setSuccess('Password reset successfully! You can now sign in.');
       setTimeout(onClose, 2500);
     } catch (err) { setError(err.message || 'Failed to reset password. Please try again.'); }
@@ -331,7 +331,7 @@ const NavLoginDropdown = ({ onAuthSuccess, onAdminLogin }) => {
     const err = validate(); if (err) { setError(err); return; }
     setSubmitting(true); setError('');
     try {
-      const endpoint = mode === 'signup' ? '/api/auth/signup' : '/api/auth/signin';
+      const endpoint = mode === 'signup' ? '/auth/signup' : '/auth/signin';
       const body = mode === 'signup'
         ? { fullName: form.fullName, email: form.email, password: form.password }
         : { email: form.email, password: form.password };
@@ -580,7 +580,7 @@ const LoginGateModal = ({ onClose, onAuthSuccess, onAdminLogin }) => {
     const err = validate(); if (err) { setError(err); return; }
     setSubmitting(true); setError('');
     try {
-      const endpoint = mode === 'signup' ? '/api/auth/signup' : '/api/auth/signin';
+      const endpoint = mode === 'signup' ? '/auth/signup' : '/auth/signin';
       const body = mode === 'signup'
         ? { fullName: form.fullName, email: form.email, password: form.password }
         : { email: form.email, password: form.password };
