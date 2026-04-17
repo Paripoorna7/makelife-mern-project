@@ -331,7 +331,7 @@ const NavLoginDropdown = ({ onAuthSuccess, onAdminLogin }) => {
     const err = validate(); if (err) { setError(err); return; }
     setSubmitting(true); setError('');
     try {
-      const endpoint = mode === 'signup' ? '/auth/signup' : '/auth/signin';
+      const endpoint = mode === 'signup' ? '/api/auth/signup' : '/api/auth/signin';
       const body = mode === 'signup'
         ? { fullName: form.fullName, email: form.email, password: form.password }
         : { email: form.email, password: form.password };
@@ -580,7 +580,7 @@ const LoginGateModal = ({ onClose, onAuthSuccess, onAdminLogin }) => {
     const err = validate(); if (err) { setError(err); return; }
     setSubmitting(true); setError('');
     try {
-      const endpoint = mode === 'signup' ? '/auth/signup' : '/auth/signin';
+      const endpoint = mode === 'signup' ? '/api/auth/signup' : '/api/auth/signin';
       const body = mode === 'signup'
         ? { fullName: form.fullName, email: form.email, password: form.password }
         : { email: form.email, password: form.password };
@@ -1316,30 +1316,48 @@ const TABS = [
                     placeholder="Tell the child's story..."
                   />
                 </div>
-                {/* Photo URL (optional manual override) */}
+                {/* Photo upload */}
                 <div>
-                  <label style={{ display:'block', fontWeight:700, color:C.adText, marginBottom:'.4rem', fontSize:'.9rem' }}>Photo URL <span style={{ fontWeight:400, color:C.adMid, fontSize:'.8rem' }}>(optional — leave as-is to keep current)</span></label>
-                  <input
-                    type="text"
-                    value={editingChild.photo||''}
-                    onChange={e=>setEditingChild(p=>({...p,photo:e.target.value}))}
-                    style={adminInput}
-                    onFocus={fi} onBlur={fo}
-                    placeholder="https://... or emoji like 🎨"
-                  />
-                </div>
-                {/* Preview */}
-                {editingChild.photo && (
-                  <div style={{ display:'flex', alignItems:'center', gap:'.8rem', background:'#faf9f6', border:`1.5px solid ${C.adBorder}`, borderRadius:'12px', padding:'.8rem 1rem' }}>
-                    <div style={{ width:'52px', height:'52px', borderRadius:'10px', background:C.adBorder, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', flexShrink:0 }}>
-                      {isValidUrl(editingChild.photo)
-                        ? <img src={getPhotoSrc(editingChild.photo)} alt="preview" style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
-                        : <span style={{ fontSize:'1.8rem' }}>{isEmoji(editingChild.photo)?editingChild.photo:'👶'}</span>
-                      }
+                  <label style={{ display:'block', fontWeight:700, color:C.adText, marginBottom:'.4rem', fontSize:'.9rem' }}>Photo</label>
+                  {/* File picker */}
+                  <label htmlFor="edit-child-photo-upload" style={{ display:'flex', alignItems:'center', gap:'.8rem', padding:'.8rem 1rem', border:`1.5px dashed ${C.adBorder}`, borderRadius:'12px', cursor:'pointer', background:C.adBg, marginBottom:'.6rem', transition:'border-color .2s' }}
+                    onMouseEnter={e=>e.currentTarget.style.borderColor=C.adAccent}
+                    onMouseLeave={e=>e.currentTarget.style.borderColor=C.adBorder}>
+                    <div style={{ width:'36px', height:'36px', borderRadius:'8px', background:`rgba(90,138,94,.1)`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      <Image size={18} color={C.adAccent}/>
                     </div>
-                    <div style={{ fontSize:'.82rem', color:C.adMid }}>Photo preview</div>
-                  </div>
-                )}
+                    <div>
+                      <div style={{ fontSize:'.9rem', fontWeight:700, color:C.adText }}>
+                        {editingChild._newPhotoFile ? editingChild._newPhotoFile.name : 'Choose new photo from device'}
+                      </div>
+                      <div style={{ fontSize:'.78rem', color:C.adMid }}>JPG, JPEG, PNG · leave empty to keep current</div>
+                    </div>
+                    <input id="edit-child-photo-upload" type="file" accept=".jpg,.jpeg,.png,image/*" style={{ display:'none' }}
+                      onChange={e=>{const f=e.target.files[0]; if(f) setEditingChild(p=>({...p,_newPhotoFile:f,_newPhotoPreview:URL.createObjectURL(f)}));}}/>
+                  </label>
+                  {/* Preview */}
+                  {(editingChild._newPhotoPreview || (editingChild.photo && isValidUrl(editingChild.photo))) && (
+                    <div style={{ display:'flex', alignItems:'center', gap:'.8rem', background:'#faf9f6', border:`1.5px solid ${C.adBorder}`, borderRadius:'12px', padding:'.8rem 1rem' }}>
+                      <div style={{ width:'60px', height:'60px', borderRadius:'10px', background:C.adBorder, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', flexShrink:0 }}>
+                        <img src={editingChild._newPhotoPreview || getPhotoSrc(editingChild.photo)} alt="preview" style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+                      </div>
+                      <div style={{ fontSize:'.82rem', color:C.adMid }}>
+                        {editingChild._newPhotoPreview ? 'New photo selected' : 'Current photo'}
+                      </div>
+                      {editingChild._newPhotoPreview && (
+                        <button type="button" onClick={()=>setEditingChild(p=>({...p,_newPhotoFile:null,_newPhotoPreview:''}))}
+                          style={{ marginLeft:'auto', background:'none', border:'none', color:'#e63946', cursor:'pointer', fontSize:'.85rem', fontWeight:700 }}>✕ Remove</button>
+                      )}
+                    </div>
+                  )}
+                  {/* Emoji fallback */}
+                  {!editingChild._newPhotoPreview && editingChild.photo && !isValidUrl(editingChild.photo) && (
+                    <div style={{ display:'flex', alignItems:'center', gap:'.8rem', background:'#faf9f6', border:`1.5px solid ${C.adBorder}`, borderRadius:'12px', padding:'.8rem 1rem' }}>
+                      <span style={{ fontSize:'2rem' }}>{editingChild.photo}</span>
+                      <div style={{ fontSize:'.82rem', color:C.adMid }}>Current emoji photo</div>
+                    </div>
+                  )}
+                </div>
                 {/* Actions */}
                 <div style={{ display:'flex', gap:'.8rem', marginTop:'.3rem' }}>
                   <button
@@ -2021,8 +2039,19 @@ const TABS = [
                         </div>
                         <div>
                           <label style={{ fontSize:'.88rem', color:C.adMid, fontWeight:700, display:'block', marginBottom:'.4rem' }}>Child's Photo</label>
-                          <input type="file" name="photo" accept=".jpg,.jpeg,.png" style={{ padding:'.8rem', fontSize:'.9rem', border:`1px solid ${C.adBorder}`, borderRadius:'12px', cursor:'pointer', background:C.adBg, width:'100%', boxSizing:'border-box' }} onChange={e=>{const f=e.target.files[0];if(f){const pv=document.getElementById('admin-photo-preview');if(pv){pv.src=URL.createObjectURL(f);pv.style.display='block';}}}}/>
-                          <div style={{ display:'flex', justifyContent:'center', marginTop:'.5rem' }}><img id="admin-photo-preview" alt="preview" style={{ display:'none', width:'100px', height:'100px', objectFit:'contain', borderRadius:'12px', border:`2px solid ${C.adBorder}` }}/></div>
+                          <label htmlFor="child-photo-upload" style={{ display:'flex', alignItems:'center', gap:'.8rem', padding:'.8rem 1rem', border:`1.5px dashed ${C.adBorder}`, borderRadius:'12px', cursor:'pointer', background:C.adBg, width:'100%', boxSizing:'border-box', transition:'border-color .2s' }}
+                            onMouseEnter={e=>e.currentTarget.style.borderColor=C.adAccent}
+                            onMouseLeave={e=>e.currentTarget.style.borderColor=C.adBorder}>
+                            <div style={{ width:'36px', height:'36px', borderRadius:'8px', background:`rgba(90,138,94,.1)`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                              <Image size={18} color={C.adAccent}/>
+                            </div>
+                            <div>
+                              <div style={{ fontSize:'.9rem', fontWeight:700, color:C.adText }}>Choose photo from device</div>
+                              <div style={{ fontSize:'.78rem', color:C.adMid }}>JPG, JPEG, PNG supported</div>
+                            </div>
+                            <input id="child-photo-upload" type="file" name="photo" accept=".jpg,.jpeg,.png,image/*" style={{ display:'none' }} onChange={e=>{const f=e.target.files[0];if(f){const pv=document.getElementById('admin-photo-preview');if(pv){pv.src=URL.createObjectURL(f);pv.style.display='block';}}}}/>
+                          </label>
+                          <div style={{ display:'flex', justifyContent:'center', marginTop:'.5rem' }}><img id="admin-photo-preview" alt="preview" style={{ display:'none', width:'100px', height:'100px', objectFit:'cover', borderRadius:'12px', border:`2px solid ${C.adBorder}` }}/></div>
                         </div>
                         <textarea name="story" placeholder="Child's Story" required rows="3" style={{...adminInput,resize:'vertical'}} onFocus={fi} onBlur={fo}/>
                         <div style={{ display:'flex', gap:'.8rem' }}>
