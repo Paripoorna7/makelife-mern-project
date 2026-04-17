@@ -1103,21 +1103,28 @@ useEffect(() => {
     const fd = new FormData(e.target);
     try {
       const photoFile = fd.get('photo');
-      if (!photoFile||photoFile.size===0){ showToast('Please select a photo before submitting.','error'); return; }
-      const up=new FormData(); up.append('photo',photoFile);
-      const token=localStorage.getItem('ml_admin_token')||localStorage.getItem('ml_token');
-      const ur=await fetch(`${API}/upload`,{method:'POST',body:up,headers:token?{Authorization:`Bearer ${token}`}:{}});
-      if(!ur.ok){const t=await ur.text();throw new Error('Photo upload failed: '+t.slice(0,200));}
-      const uploadResult=await ur.json();
-      const url=uploadResult.url||uploadResult.path||uploadResult.filename;
-      if(!url) throw new Error('Upload succeeded but no URL returned.');
-      const childData={name:fd.get('name'),age:parseInt(fd.get('age')),gender:fd.get('gender')||'',story:fd.get('story'),photo:url};
-      const saved=await adminFetch('/children',{method:'POST',body:JSON.stringify(childData)});
-      setChildren(prev=>[...prev,saved]);
+      const token = localStorage.getItem('ml_admin_token') || localStorage.getItem('ml_token');
+
+      // Build multipart form — send photo directly to /children
+      const formData = new FormData();
+      formData.append('name',   fd.get('name'));
+      formData.append('age',    fd.get('age'));
+      formData.append('gender', fd.get('gender') || '');
+      formData.append('story',  fd.get('story'));
+      if (photoFile && photoFile.size > 0) formData.append('photo', photoFile);
+
+      const res = await fetch(`${API}/children`, {
+        method: 'POST',
+        body: formData,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) { const t = await res.json(); throw new Error(t.error || 'Failed to add child'); }
+      const saved = await res.json();
+      setChildren(prev => [...prev, saved]);
       setShowAddForm(false); e.target.reset();
-      const pv=document.getElementById('admin-photo-preview'); if(pv) pv.style.display='none';
-      showToast(`${childData.name}'s profile has been added successfully.`);
-    } catch(err){showToast(err.message,'error');}
+      const pv = document.getElementById('admin-photo-preview'); if (pv) pv.style.display = 'none';
+      showToast(`${saved.name}'s profile has been added successfully.`);
+    } catch (err) { showToast(err.message, 'error'); }
   };
 
   const markReplied = async id => {
@@ -1607,9 +1614,11 @@ const TABS = [
               <div style={{ marginBottom:'.8rem', display:'flex', alignItems:'center', gap:'1rem' }}>
                 <img
                   src={founderPhotoPreview ||
-                    (founderStory.founderPhoto.startsWith('/uploads/')
-                      ? `${process.env.REACT_APP_API_URL}${founderStory.founderPhoto}`
-                      : founderStory.founderPhoto)}
+                    (founderStory.founderPhoto.startsWith('http')
+                      ? founderStory.founderPhoto
+                      : founderStory.founderPhoto.startsWith('/uploads/')
+                        ? `${process.env.REACT_APP_API_URL}${founderStory.founderPhoto}`
+                        : founderStory.founderPhoto)}
                   alt="preview"
                   style={{ width:'90px', height:'110px', objectFit:'cover',
                     borderRadius:'12px', border:`2px solid ${C.adBorder}` }}
@@ -1682,20 +1691,22 @@ const TABS = [
           setFounderSaving(true);
           try {
             let photoUrl = founderStory.founderPhoto;
-            if (founderPhotoFile) {
-              const token = localStorage.getItem('ml_admin_token') || localStorage.getItem('ml_token');
-              const fd = new FormData();
-              fd.append('photo', founderPhotoFile);
-              try {
-                const ur = await fetch(`${API}/upload`, { method:'POST', body:fd, headers: token?{Authorization:`Bearer ${token}`}:{} });
-                if (ur.ok) { const res = await ur.json(); photoUrl = res.url || res.path || res.filename || photoUrl; }
-              } catch {}
-              setFounderPhotoFile(null); setFounderPhotoPreview('');
-            }
-            const payload = { ...founderStory, founderPhoto: photoUrl };
-            try { await adminFetch(`${process.env.REACT_APP_API_URL}/founder-story`, { method:'POST', body:JSON.stringify(payload) }); } catch {}
+            const token = localStorage.getItem('ml_admin_token') || localStorage.getItem('ml_token');
+            const fd = new FormData();
+            // Append all story fields
+            Object.entries({ ...founderStory, founderPhoto: photoUrl }).forEach(([k,v]) => fd.append(k, v||''));
+            // Attach new photo file if selected
+            if (founderPhotoFile) fd.append('photo', founderPhotoFile);
+            const res = await fetch(`${API}/founder-story`, {
+              method: 'PUT',
+              body: fd,
+              headers: token ? { Authorization: `Bearer ${token}` } : {},
+            });
+            const saved = res.ok ? await res.json() : null;
+            const payload = saved || { ...founderStory, founderPhoto: photoUrl };
             try { localStorage.setItem('ml_founder_story', JSON.stringify(payload)); } catch {}
             setFounderStory(payload);
+            setFounderPhotoFile(null); setFounderPhotoPreview('');
             showToast('Our Story section saved successfully.');
           } catch(err) { showToast(err.message||'Failed to save.','error'); }
           finally { setFounderSaving(false); }
@@ -2006,7 +2017,7 @@ const TABS = [
                         </div>
                         <div>
                           <label style={{ fontSize:'.88rem', color:C.adMid, fontWeight:700, display:'block', marginBottom:'.4rem' }}>Child's Photo</label>
-                          <input type="file" name="photo" accept=".jpg,.jpeg,.png" required style={{ padding:'.8rem', fontSize:'.9rem', border:`1px solid ${C.adBorder}`, borderRadius:'12px', cursor:'pointer', background:C.adBg, width:'100%', boxSizing:'border-box' }} onChange={e=>{const f=e.target.files[0];if(f){const pv=document.getElementById('admin-photo-preview');if(pv){pv.src=URL.createObjectURL(f);pv.style.display='block';}}}}/>
+                          <input type="file" name="photo" accept=".jpg,.jpeg,.png" style={{ padding:'.8rem', fontSize:'.9rem', border:`1px solid ${C.adBorder}`, borderRadius:'12px', cursor:'pointer', background:C.adBg, width:'100%', boxSizing:'border-box' }} onChange={e=>{const f=e.target.files[0];if(f){const pv=document.getElementById('admin-photo-preview');if(pv){pv.src=URL.createObjectURL(f);pv.style.display='block';}}}}/>
                           <div style={{ display:'flex', justifyContent:'center', marginTop:'.5rem' }}><img id="admin-photo-preview" alt="preview" style={{ display:'none', width:'100px', height:'100px', objectFit:'contain', borderRadius:'12px', border:`2px solid ${C.adBorder}` }}/></div>
                         </div>
                         <textarea name="story" placeholder="Child's Story" required rows="3" style={{...adminInput,resize:'vertical'}} onFocus={fi} onBlur={fo}/>
