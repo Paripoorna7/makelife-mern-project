@@ -2,7 +2,7 @@
 # MakeLife - NGO Management System
 
 Welcome to the **MakeLife** repository! This is a comprehensive MERN (MongoDB, Express, React, Node.js) stack project designed to streamline and manage the operations of a Non-Governmental Organization (NGO).
-
+Live Link : https://makelife-mern-project-w4e9.vercel.app
 ## 🌍 About MakeLife
 
 MakeLife is a platform dedicated to making NGO processes more efficient, transparent, and user-friendly. Focus areas include:
@@ -53,38 +53,7 @@ Ensure you have Node.js and MongoDB installed on your local machine.
    git clone https://github.com/Paripoorna7/makelife-mern-project.git
    ```
 2. Navigate into the project directory:
-   ```sh
-   cd makelife-mern-project
-   ```
-
-### Backend Setup
-1. Open a terminal and navigate to the backend directory:
-   ```sh
-   cd backend
-   ```
-2. Install the backend dependencies:
-   ```sh
-   npm install
-   ```
-3. Set up environment variables. Create a `.env` file in the `backend` directory and add your connection strings (e.g., `MONGO_URI`).
-4. Start the backend server:
-   ```sh
-   npm start
-   ```
-
-### Frontend Setup
-1. Open a new terminal instance and navigate to the frontend directory:
-   ```sh
-   cd frontend
-   ```
-2. Install the frontend dependencies:
-   ```sh
-   npm install
-   ```
-3. Start the application:
-   ```sh
-   npm start
-   ```
+   
 
 ## 🤝 Contributing
 
