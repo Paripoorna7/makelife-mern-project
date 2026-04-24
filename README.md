@@ -3,6 +3,7 @@
 
 Welcome to the **MakeLife** repository! This is a comprehensive MERN (MongoDB, Express, React, Node.js) stack project designed to streamline and manage the operations of a Non-Governmental Organization (NGO).
 Live Link : https://makelife-mern-project-w4e9.vercel.app
+
 ## 🌍 About MakeLife
 
 MakeLife is a platform dedicated to making NGO processes more efficient, transparent, and user-friendly. Focus areas include:
