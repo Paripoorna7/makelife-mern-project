@@ -4618,10 +4618,11 @@ const handleCustomAmountSubmit = async () => {
                   <FieldError msg={goodsErrors.email} />
               </div>
               <div>
-                <label style={{ display: 'block', fontWeight: 700, color: C.dark, marginBottom: '.35rem', fontSize: '.88rem' }}>Phone Number</label>
+                <label style={{ display: 'block', fontWeight: 700, color: C.dark, marginBottom: '.35rem', fontSize: '.88rem' }}>Phone Number *</label>
                 <input type="tel" maxLength="10" placeholder="10-digit mobile number" value={goodsContactForm.phone}
-                  onChange={e => setGoodsContactForm(p => ({ ...p, phone: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
-                  style={inputBase} onFocus={fi} onBlur={fo} />
+                  onChange={e => { setGoodsContactForm(p => ({ ...p, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })); setGoodsErrors(p=>({...p,phone:''})); }}
+                  style={{...inputBase, borderColor: goodsErrors.phone ? '#e63946' : undefined}} onFocus={fi} onBlur={fo} />
+                <FieldError msg={goodsErrors.phone} />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: 700, color: C.dark, marginBottom: '.35rem', fontSize: '.88rem' }}>State *</label>
@@ -5083,6 +5084,7 @@ const handleCustomAmountSubmit = async () => {
                   const errs = {};
                   if (!goodsContactForm.name.trim()) errs.name = 'Full name is required.';
                   if (!goodsContactForm.email.trim()) errs.email = 'Email address is required.';
+                  if (!goodsContactForm.phone || goodsContactForm.phone.length < 10) errs.phone = 'Enter a valid 10-digit phone number.';
                   if (!goodsContactForm.address.trim()) errs.address = 'Pickup address is required.';
                   if (!goodsContactForm.pincode || goodsContactForm.pincode.length < 6) errs.pincode = 'Enter a valid 6-digit PIN code.';
                   if (!goodsContactForm.state) errs.state = 'Please select your state.';
@@ -5480,7 +5482,7 @@ onKeyDown={e => {
                 {contactSuccess && <div style={{background:'#d4edda',color:'#155724',border:'2px solid #c3e6cb',borderRadius:'12px',padding:'1rem 1.2rem',marginBottom:'1.2rem',fontSize:'.95rem',fontWeight:600}}> Message sent! We'll get back to you soon.</div>}
                 {contactError && <div style={{background:'#fff0f0',border:'2px solid #f5c6cb',borderRadius:'12px',padding:'.9rem 1.1rem',marginBottom:'1.2rem',color:'#c0392b',fontWeight:700}}>{contactError==='NETWORK_ERROR'?'Backend not running — please start your server':contactError}</div>}
                 <form onSubmit={handleContactSubmit} style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
-                  {[['name','text','Your Name',true],['email','email','Your Email',true],['phone','tel','Phone (Optional)',false]].map(([name,type,ph,req])=>(<input key={name} type={type} name={name} placeholder={ph} required={req} value={contactForm[name]} onChange={handleContactChange} style={inputBase} onFocus={fi} onBlur={fo}/>))}
+                  {[['name','text','Your Name',true],['email','email','Your Email',true],['phone','tel','Phone *',true]].map(([name,type,ph,req])=>(<input key={name} type={type} name={name} placeholder={ph} required={req} value={contactForm[name]} onChange={handleContactChange} style={inputBase} onFocus={fi} onBlur={fo}/>))}
                   <textarea name="message" placeholder="Your Message" required rows="4" value={contactForm.message} onChange={handleContactChange} style={{...inputBase,resize:'vertical'}} onFocus={fi} onBlur={fo}/>
                   <button type="submit" disabled={contactSubmitting} style={{...btnP,width:'100%',justifyContent:'center',borderRadius:'14px',padding:'1.1rem',background:contactSubmitting?'#ccc':'linear-gradient(135deg,#d97757,#c65d3f)',cursor:contactSubmitting?'not-allowed':'pointer',boxShadow:'none'}}>{contactSubmitting?'Sending…':'Send Message'}</button>
                 </form>
@@ -5522,7 +5524,7 @@ onKeyDown={e => {
                 <div style={{display:'grid',gridTemplateColumns:isTablet?'1fr':'1fr 1fr',gap:'1.2rem',marginBottom:'1.2rem'}}>
                   <div><label style={{display:'block',fontWeight:700,color:C.dark,marginBottom:'.4rem',fontSize:'.95rem'}}>Full Name *</label><input type="text" placeholder="Your full name" value={volunteerForm.fullName} onChange={e=>setVolunteerForm(p=>({...p,fullName:e.target.value}))} style={inputBase} onFocus={fi} onBlur={fo}/></div>
                   <div><label style={{display:'block',fontWeight:700,color:C.dark,marginBottom:'.4rem',fontSize:'.95rem'}}>Email Address *</label><input type="email" placeholder="your@email.com" value={volunteerForm.email} onChange={e=>setVolunteerForm(p=>({...p,email:e.target.value}))} style={inputBase} onFocus={fi} onBlur={fo}/></div>
-                  <div><label style={{display:'block',fontWeight:700,color:C.dark,marginBottom:'.4rem',fontSize:'.95rem'}}>Phone Number</label><input type="tel" maxLength="10" placeholder="10-digit mobile number" value={volunteerForm.phone} onChange={e=>setVolunteerForm(p=>({...p,phone:e.target.value.replace(/\\D/g, '').slice(0, 10)}))} style={inputBase} onFocus={fi} onBlur={fo}/></div>
+                  <div><label style={{display:'block',fontWeight:700,color:C.dark,marginBottom:'.4rem',fontSize:'.95rem'}}>Phone Number *</label><input type="tel" maxLength="10" placeholder="10-digit mobile number" required value={volunteerForm.phone} onChange={e=>setVolunteerForm(p=>({...p,phone:e.target.value.replace(/\D/g, '').slice(0, 10)}))} style={inputBase} onFocus={fi} onBlur={fo}/></div>
                   <div><label style={{display:'block',fontWeight:700,color:C.dark,marginBottom:'.4rem',fontSize:'.95rem'}}>Age</label><input type="number" placeholder="Your age" min="16" max="80" value={volunteerForm.age} onChange={e=>setVolunteerForm(p=>({...p,age:e.target.value}))} style={inputBase} onFocus={fi} onBlur={fo}/></div>
                   <div><label style={{display:'block',fontWeight:700,color:C.dark,marginBottom:'.4rem',fontSize:'.95rem'}}>Occupation</label><input type="text" placeholder="e.g. Teacher, Doctor" value={volunteerForm.occupation} onChange={e=>setVolunteerForm(p=>({...p,occupation:e.target.value}))} style={inputBase} onFocus={fi} onBlur={fo}/></div>
                   <div><label style={{display:'block',fontWeight:700,color:C.dark,marginBottom:'.4rem',fontSize:'.95rem'}}>Availability *</label>
@@ -5545,7 +5547,8 @@ onKeyDown={e => {
                 <div style={{marginBottom:'1.2rem'}}><label style={{display:'block',fontWeight:700,color:C.dark,marginBottom:'.4rem',fontSize:'.95rem'}}>Previous Experience</label><textarea placeholder="Briefly describe any relevant experience..." rows="3" value={volunteerForm.experience} onChange={e=>setVolunteerForm(p=>({...p,experience:e.target.value}))} style={{...inputBase,resize:'vertical'}} onFocus={fi} onBlur={fo}/></div>
                 <div style={{marginBottom:'1.5rem'}}><label style={{display:'block',fontWeight:700,color:C.dark,marginBottom:'.4rem',fontSize:'.95rem'}}>Why volunteer with us? *</label><textarea placeholder="Tell us what motivates you..." rows="4" value={volunteerForm.motivation} onChange={e=>setVolunteerForm(p=>({...p,motivation:e.target.value}))} style={{...inputBase,resize:'vertical'}} onFocus={fi} onBlur={fo}/></div>
                 <button onClick={async()=>{
-                  if(!volunteerForm.fullName.trim()||!volunteerForm.email.trim()||!volunteerForm.motivation.trim()){setVolunteerError('Please fill in all required fields.');return;}
+                  if(!volunteerForm.fullName.trim()||!volunteerForm.email.trim()||!volunteerForm.motivation.trim()||!volunteerForm.phone.trim()){setVolunteerError('Please fill in all required fields.');return;}
+                  if(volunteerForm.phone.length < 10){setVolunteerError('Please enter a valid 10-digit phone number.');return;}
                   if(!/\S+@\S+\.\S+/.test(volunteerForm.email)){setVolunteerError('Please enter a valid email address.');return;}
                   setVolunteerSubmitting(true);setVolunteerError('');
                   try{
