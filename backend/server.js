@@ -9,7 +9,7 @@ const fs = require('fs');
 const app = express();
 
 app.use(cors({
-  origin: '*',
+  origin: "https://makelife-mern-project-w4e9.vercel.app",
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
