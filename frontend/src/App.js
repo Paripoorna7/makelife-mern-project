@@ -50,8 +50,7 @@ const OrphanageWebsite = () => {
 
   const fetchChildren = async () => {
     setLoading(true);
-    try {
-      const response = await fetch('http://localhost:5000/api/children');
+    try {const response = await fetch('https://5923d61f-7322-4393-a25c-ae99b910d170-00-1loycy3gk6sb.sisko.replit.dev/api/children');
       const data = await response.json();
       setChildren(data);
     } catch (error) {
@@ -69,7 +68,7 @@ const OrphanageWebsite = () => {
 
   const fetchDonations = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/donations');
+const response = await fetch('https://5923d61f-7322-4393-a25c-ae99b910d170-00-1loycy3gk6sb.sisko.replit.dev/api/donations');
       const data = await response.json();
       setDonations(data);
     } catch (error) {
@@ -85,12 +84,12 @@ const OrphanageWebsite = () => {
       if (!photoFile || photoFile.size === 0) { alert('Please select a photo'); return; }
       const uploadData = new FormData();
       uploadData.append('photo', photoFile);
-      const uploadResponse = await fetch('http://localhost:5000/api/upload', { method: 'POST', body: uploadData });
+      const uploadResponse = await fetch('https://5923d61f-7322-4393-a25c-ae99b910d170-00-1loycy3gk6sb.sisko.replit.dev/api/upload', { method: 'POST', body: uploadData });
       if (!uploadResponse.ok) throw new Error('Upload failed: ' + await uploadResponse.text());
       const uploadResult = await uploadResponse.json();
       if (!uploadResult.url) throw new Error('No URL returned from upload');
       const childData = { name: formData.get('name'), age: parseInt(formData.get('age')), story: formData.get('story'), photo: uploadResult.url };
-      const response = await fetch('http://localhost:5000/api/children', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(childData) });
+    const response = await fetch('https://5923d61f-7322-4393-a25c-ae99b910d170-00-1loycy3gk6sb.sisko.replit.dev/api/children', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(childData) });
       if (!response.ok) throw new Error('Failed to save child: ' + await response.text());
       const newChild = await response.json();
       setChildren([...children, newChild]);
@@ -105,7 +104,7 @@ const OrphanageWebsite = () => {
   const deleteChild = async (id) => {
     if (!window.confirm('Are you sure you want to delete this child profile?')) return;
     try {
-      await fetch(`http://localhost:5000/api/children/${id}`, { method: 'DELETE' });
+    await fetch(`https://5923d61f-7322-4393-a25c-ae99b910d170-00-1loycy3gk6sb.sisko.replit.dev/api/children/${id}`, { method: 'DELETE' });
       setChildren(children.filter(c => c._id !== id));
       alert('Child profile deleted successfully!');
     } catch (error) { alert('Failed to delete child.'); }
@@ -126,7 +125,16 @@ const OrphanageWebsite = () => {
     try {
       const donationData = { donorName: donorName.trim(), amount: tempDonationAmount };
       if (sponsorChildId) { donationData.childId = sponsorChildId; donationData.childName = sponsorChildName; }
-      const response = await fetch('http://localhost:5000/api/donations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(donationData) });
+    const response = await fetch(
+  'https://5923d61f-7322-4393-a25c-ae99b910d170-00-1loycy3gk6sb.sisko.replit.dev/api/donations',
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(donationData)
+  }
+);
       if (response.ok) {
         alert(sponsorChildId ? `Thank you ${donorName} for sponsoring ${sponsorChildName}!` : `Thank you ${donorName} for your donation!`);
         setDonorName(''); setSponsorChildId(null); setSponsorChildName(''); setShowDonationModal(false); setTempDonationAmount(0);
@@ -157,7 +165,7 @@ const OrphanageWebsite = () => {
         annualIncome: parseFloat(adoptForm.annualIncome),
         familyMembers: parseInt(adoptForm.familyMembers)
       };
-      const res = await fetch('http://localhost:5000/api/adoptions', {
+const res = await fetch('https://5923d61f-7322-4393-a25c-ae99b910d170-00-1loycy3gk6sb.sisko.replit.dev/api/adoptions', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
       });
       if (!res.ok) throw new Error((await res.json()).error || 'Server error');
