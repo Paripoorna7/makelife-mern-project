@@ -6,7 +6,7 @@ const { uploadMember, getFileUrl } = require('../config/cloudinary');
 /* GET all members */
 router.get('/', async (_req, res) => {
   try {
-    res.json(await Member.find().sort({ createdAt: -1 }));
+    res.json(await Member.find().sort({ sortOrder: 1, createdAt: 1 }));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -27,8 +27,9 @@ router.post('/', uploadMember.single('photo'), async (req, res) => {
 /* PUT — update member with optional new photo */
 router.put('/:id', uploadMember.single('photo'), async (req, res) => {
   try {
-    const { name, role, email, phone, joinedYear, bio } = req.body;
+    const { name, role, email, phone, joinedYear, bio, sortOrder } = req.body;
     const update = { name, role, email, phone, joinedYear, bio };
+    if (sortOrder !== undefined && sortOrder !== '') update.sortOrder = Number(sortOrder);
     if (req.file) update.photo = getFileUrl(req.file);
     else if (req.body.photo) update.photo = req.body.photo;
     const updated = await Member.findByIdAndUpdate(req.params.id, update, { new: true });
