@@ -1,86 +1,92 @@
-<<<<<<< HEAD
-# MakeLife - NGO Management System
+MakeLife - NGO Management System
+Welcome to the MakeLife repository! This is a comprehensive MERN (MongoDB, Express, React, Node.js) stack project designed to streamline and manage the operations of a Non-Governmental Organization (NGO).
 
-Welcome to the **MakeLife** repository! This is a comprehensive MERN (MongoDB, Express, React, Node.js) stack project designed to streamline and manage the operations of a Non-Governmental Organization (NGO).
-
-# Live Link : https://makelife-mern-project-w4e9.vercel.app
-
-
-## 🌍 About MakeLife
-
+🌍 About MakeLife
 MakeLife is a platform dedicated to making NGO processes more efficient, transparent, and user-friendly. Focus areas include:
 
-- **Volunteer Management:** Easy registration and management for people willing to donate their time and skills.
-- **Donation Processing:** Secure and straightforward tracking of monetary and resource donations.
-- **Data Persistence:** Robust backend data validation and storage ensuring all form submissions are consistently saved to the database without redundant data or empty fields.
-
-## 🚀 Technologies Used
-
-This project utilizes modern web technologies:
-
-### Frontend
-- **React.js** - Dynamic and responsive user interfaces.
-- **Lucide-React** - Beautiful, consistent iconography.
-- **CSS / Custom Styling** - Clean, professional, and accessible design.
-
-### Backend
-- **Node.js & Express.js** - Scalable server-side operations and API creation.
-- **MongoDB** - NoSQL database for flexible data modeling and persistence.
-- **Mongoose** - Elegant MongoDB object modeling for Node.js.
-
-## 📁 Project Structure
-
-The repository is modularized into `frontend` and `backend` directories to keep the separation of concerns clear and the codebase maintainable.
-
-```
+Child Profiles: Add, update, and manage children available for sponsorship or adoption.
+Volunteer Management: Easy registration and management for people willing to donate their time and skills.
+Donation Processing: Secure and straightforward tracking of monetary and goods donations.
+Adoption Requests: Submit and manage adoption applications with status tracking.
+Team Members: Manage NGO team profiles with photos.
+Founder Story: Editable founder story section for the public website.
+Slideshow: Upload and manage homepage slideshow images.
+Contact Messages: Receive and manage public contact form submissions.
+Admin Dashboard: Secure admin panel to manage all data in one place.
+Data Persistence: Robust backend with MongoDB Atlas ensuring all data persists across sessions.
+🚀 Technologies Used
+Frontend
+React.js - Dynamic and responsive user interfaces.
+Lucide-React - Beautiful, consistent iconography.
+CSS / Custom Styling - Clean, professional, and accessible design.
+Backend
+Node.js & Express.js - Scalable server-side operations and API creation.
+MongoDB Atlas - Cloud-hosted NoSQL database for flexible data modeling and persistence.
+Mongoose - Elegant MongoDB object modeling for Node.js.
+Cloudinary - Cloud image storage for all uploaded photos.
+Multer + multer-storage-cloudinary - Multipart file upload handling.
+bcryptjs + JWT - Secure authentication.
+📁 Project Structure
 MakeLife/
-├── backend/            # Express server, MongoDB models, and API routes
-├── frontend/           # React application, components, and UI assets
-└── README.md           # Project documentation
-```
+├── backend/
+│   ├── config/         # Cloudinary configuration
+│   ├── models/         # Mongoose models
+│   ├── routes/         # Express API routes
+│   ├── uploads/        # Temporary local upload folder
+│   ├── server.js       # Express app entry point
+│   └── .env            # Environment variables (not committed)
+├── frontend/
+│   ├── src/
+│   │   └── App.js      # Full React single-page application
+│   └── public/
+└── README.md
+🛠️ Running Locally
+Prerequisites
+Node.js v16+
+A MongoDB Atlas account
+A Cloudinary account
+1. Clone the repository
+git clone https://github.com/Paripoorna7/makelife-mern-project.git
+cd makelife-mern-project
+2. Backend Setup
+cd backend
+npm install
+Create a .env file inside the backend/ folder:
 
-## 🛠️ Getting Started
+PORT=3001
+MONGO_URI=your_mongodb_atlas_connection_string
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+JWT_SECRET=your_jwt_secret
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+Start the backend:
 
-To get a local copy up and running, follow these simple steps:
-
-### Prerequisites
-
-Ensure you have Node.js and MongoDB installed on your local machine.
-- [Node.js](https://nodejs.org/)
-- [MongoDB](https://www.mongodb.com/)
-
-### Installation
-
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/Paripoorna7/makelife-mern-project.git
-   ```
-2. Navigate into the project directory:
-   
-
-## 🤝 Contributing
-
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-=======
-## Backend
-
-cd backend  
-npm install  
-npm start  
-
-## Frontend
-
-npx create-react-app frontend  
-Replace src/App.js with provided file  
 npm start
->>>>>>> 145dd94 (Updated backend to use MongoDB URI with environment variables)
+Backend runs on http://localhost:3001
+
+3. Frontend Setup
+cd ../frontend
+npm install
+Create a .env file inside the frontend/ folder:
+
+REACT_APP_API_URL=http://localhost:3001
+Start the frontend:
+
+npm start
+Frontend runs on http://localhost:3000
+
+🔐 Admin Access
+Navigate to http://localhost:3000 → click Admin in the navbar.
+
+Default credentials:
+
+Username: admin
+Password: admin123
+🤝 Contributing
+Fork the Project
+Create your Feature Branch (git checkout -b feature/AmazingFeature)
+Commit your Changes (git commit -m 'Add some AmazingFeature')
+Push to the Branch (git push origin feature/AmazingFeature)
+Open a Pull Request
