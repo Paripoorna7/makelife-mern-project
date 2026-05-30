@@ -87,7 +87,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// PATCH /api/adoptions/:id/status — Approve or reject
+// PATCH /api/adoptions/:id/status — Approve or reject (explicit /status suffix)
 router.patch('/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
@@ -101,6 +101,30 @@ router.patch('/:id/status', async (req, res) => {
     if (!adoption) return res.status(404).json({ error: 'Application not found.' });
 
     // If approved, mark child as adopted
+    if (status === 'approved') {
+      const Child = require('../models/Child');
+      await Child.findByIdAndUpdate(adoption.childId, { isAdopted: true });
+    }
+
+    res.json({ success: true, adoption });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/adoptions/:id — Approve or reject (alias without /status suffix, used by frontend)
+router.patch('/:id', async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['pending', 'approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status value.' });
+    }
+
+    const adoption = await Adoption.findByIdAndUpdate(
+      req.params.id, { status }, { new: true }
+    );
+    if (!adoption) return res.status(404).json({ error: 'Application not found.' });
+
     if (status === 'approved') {
       const Child = require('../models/Child');
       await Child.findByIdAndUpdate(adoption.childId, { isAdopted: true });

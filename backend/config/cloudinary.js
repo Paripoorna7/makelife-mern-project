@@ -8,13 +8,13 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Storage for general uploads (children photos, slideshow, etc.)
+// Storage for general uploads (children photos, slideshow, founder story, etc.)
 const generalStorage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder:         'makelife/general',
+    folder:          'makelife/general',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 1200, height: 1200, crop: 'limit', quality: 'auto' }],
+    transformation:  [{ width: 1200, height: 1200, crop: 'limit', quality: 'auto' }],
   },
 });
 
@@ -22,20 +22,30 @@ const generalStorage = new CloudinaryStorage({
 const memberStorage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder:         'makelife/members',
+    folder:          'makelife/members',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 600, height: 600, crop: 'fill', gravity: 'face', quality: 'auto' }],
+    transformation:  [{ width: 600, height: 600, crop: 'fill', gravity: 'face', quality: 'auto' }],
   },
 });
 
 const uploadGeneral = multer({
   storage: generalStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
 });
 
 const uploadMember = multer({
   storage: memberStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
 });
 
-module.exports = { cloudinary, uploadGeneral, uploadMember };
+/**
+ * getFileUrl(req.file)
+ * multer-storage-cloudinary stores the Cloudinary URL in req.file.path.
+ * This helper also checks req.file.secure_url as a fallback (some versions differ).
+ */
+const getFileUrl = (file) => {
+  if (!file) return '';
+  return file.path || file.secure_url || '';
+};
+
+module.exports = { cloudinary, uploadGeneral, uploadMember, getFileUrl };

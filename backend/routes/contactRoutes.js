@@ -59,4 +59,17 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// PATCH /api/contact/:id — Mark message as replied
+router.patch('/:id', async (req, res) => {
+  try {
+    const update = {};
+    if (req.body.replied !== undefined) update.replied = req.body.replied;
+    const contact = await Contact.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!contact) return res.status(404).json({ error: 'Message not found.' });
+    res.json({ success: true, contact });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

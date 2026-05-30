@@ -1,6 +1,6 @@
-const router  = require('express').Router();
+const router   = require('express').Router();
 const mongoose = require('mongoose');
-const { uploadGeneral } = require('../config/cloudinary');
+const { uploadGeneral, getFileUrl } = require('../config/cloudinary');
 
 const founderStorySchema = new mongoose.Schema({
   founderName:  { type: String, default: '' },
@@ -10,12 +10,12 @@ const founderStorySchema = new mongoose.Schema({
   story1:       { type: String, default: '' },
   story2:       { type: String, default: '' },
   story3:       { type: String, default: '' },
-  updatedAt:    { type: Date, default: Date.now }
+  updatedAt:    { type: Date,   default: Date.now },
 });
+const FounderStory =
+  mongoose.models.FounderStory || mongoose.model('FounderStory', founderStorySchema);
 
-const FounderStory = mongoose.models.FounderStory || mongoose.model('FounderStory', founderStorySchema);
-
-/* ── GET founder story ── */
+/* GET founder story */
 router.get('/', async (req, res) => {
   try {
     let story = await FounderStory.findOne();
@@ -26,11 +26,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-/* ── PUT update founder story (with optional photo upload) ── */
+/* PUT — update founder story with optional photo */
 router.put('/', uploadGeneral.single('photo'), async (req, res) => {
   try {
     const update = { ...req.body, updatedAt: new Date() };
-    if (req.file) update.founderPhoto = req.file.path; // Cloudinary URL
+    if (req.file) update.founderPhoto = getFileUrl(req.file);
     let story = await FounderStory.findOne();
     if (!story) {
       story = await FounderStory.create(update);
@@ -44,11 +44,11 @@ router.put('/', uploadGeneral.single('photo'), async (req, res) => {
   }
 });
 
-/* ── POST also accepted (alias for PUT) ── */
+/* POST — alias for PUT */
 router.post('/', uploadGeneral.single('photo'), async (req, res) => {
   try {
     const update = { ...req.body, updatedAt: new Date() };
-    if (req.file) update.founderPhoto = req.file.path;
+    if (req.file) update.founderPhoto = getFileUrl(req.file);
     let story = await FounderStory.findOne();
     if (!story) {
       story = await FounderStory.create(update);
